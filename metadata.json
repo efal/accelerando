@@ -1,0 +1,5 @@
+{
+  "name": "Accelerando Metronome",
+  "description": "Ein intelligentes Metronom für Musiker, das die Geschwindigkeit während des Übens automatisch steigert. Mit integriertem KI-Übungs-Coach.",
+  "requestFramePermissions": []
+}
