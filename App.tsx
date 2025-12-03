@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Square, Settings2, Sparkles, AlertCircle, RefreshCw, Volume2, Zap } from 'lucide-react';
+import { Play, Square, Settings2, RefreshCw, Volume2, Zap } from 'lucide-react';
 import { audioEngine } from './services/audioEngine';
-import { getPracticeAdvice } from './services/geminiService';
+
 import { Knob } from './components/Knob';
 import { PracticeSettings } from './types';
 
@@ -19,9 +19,7 @@ const App: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentBpm, setCurrentBpm] = useState(settings.startBpm);
   const [currentBeat, setCurrentBeat] = useState(-1);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiMessage, setAiMessage] = useState<string | null>(null);
+
 
   // Initialize Audio Engine settings whenever React state changes
   useEffect(() => {
@@ -66,26 +64,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleAiGenerate = async () => {
-    if (!aiPrompt.trim()) return;
-    setIsAiLoading(true);
-    setAiMessage(null);
-    try {
-      const routine = await getPracticeAdvice(aiPrompt);
-      setSettings(prev => ({
-        ...prev,
-        startBpm: routine.startBpm,
-        increaseAmount: routine.increaseAmount,
-        increaseIntervalBars: routine.increaseIntervalBars
-      }));
-      setCurrentBpm(routine.startBpm);
-      setAiMessage(routine.description);
-    } catch (e) {
-      setAiMessage("Konnte keine Routine laden. Bitte versuche es erneut.");
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
+
 
   return (
     <div className="min-h-screen relative flex flex-col items-center py-8 px-4 font-sans">
@@ -113,14 +92,14 @@ const App: React.FC = () => {
       <div className="relative w-80 h-80 mb-12 flex items-center justify-center">
         {/* Outer glow ring */}
         <div className={`absolute inset-0 rounded-full border-4 transition-all duration-150 ${isPlaying && currentBeat === 0
-            ? 'border-cyan-400 scale-110 neon-glow-cyan neon-pulse'
-            : 'border-cyan-900/30 scale-100'
+          ? 'border-cyan-400 scale-110 neon-glow-cyan neon-pulse'
+          : 'border-cyan-900/30 scale-100'
           }`}></div>
 
         {/* Middle ring */}
         <div className={`absolute inset-8 rounded-full border-2 transition-all duration-100 ${isPlaying && currentBeat >= 0
-            ? 'border-purple-500/50 neon-glow-purple'
-            : 'border-purple-900/20'
+          ? 'border-purple-500/50 neon-glow-purple'
+          : 'border-purple-900/20'
           }`}></div>
 
         {/* Inner ring with glassmorphism */}
@@ -139,10 +118,10 @@ const App: React.FC = () => {
             <div
               key={i}
               className={`w-4 h-4 rounded-full transition-all duration-100 ${currentBeat === i
-                  ? (i === 0
-                    ? 'bg-cyan-400 neon-glow-cyan scale-150 beat-active'
-                    : 'bg-pink-400 neon-glow-pink scale-125 beat-active')
-                  : 'bg-slate-700/50 border border-slate-600/30'
+                ? (i === 0
+                  ? 'bg-cyan-400 neon-glow-cyan scale-150 beat-active'
+                  : 'bg-pink-400 neon-glow-pink scale-125 beat-active')
+                : 'bg-slate-700/50 border border-slate-600/30'
                 }`}
             />
           ))}
@@ -175,7 +154,7 @@ const App: React.FC = () => {
             <Settings2 size={20} className="text-neon-cyan" />
             <span className="text-neon-cyan">BASIC</span>
           </h3>
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Knob
               label="Start Tempo"
               value={settings.startBpm}
@@ -202,7 +181,7 @@ const App: React.FC = () => {
             <RefreshCw size={20} className="text-neon-purple" />
             <span className="text-neon-purple">TRAINER</span>
           </h3>
-          <div className="space-y-6 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
             <Knob
               label="Increase By"
               value={settings.increaseAmount}
@@ -215,6 +194,14 @@ const App: React.FC = () => {
               onChange={(v) => setSettings({ ...settings, increaseIntervalBars: v })}
               min={1} max={32}
             />
+            <div className="sm:col-span-2">
+              <Knob
+                label="Max Speed"
+                value={settings.maxBpm}
+                onChange={(v) => setSettings({ ...settings, maxBpm: v })}
+                min={settings.startBpm} max={300} unit="BPM"
+              />
+            </div>
           </div>
           <p className="text-xs text-purple-200/60 mt-4 relative z-10">
             {settings.increaseAmount > 0
@@ -224,54 +211,15 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* AI Coach Section */}
-      <div className="w-full max-w-3xl relative z-10">
-        <div className="glass-card p-8 border-pink-500/30 relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
-
-          <h3 className="text-pink-300 font-bold mb-3 flex items-center gap-2 text-xl relative z-10">
-            <Sparkles size={22} className="text-neon-pink" />
-            <span className="text-neon-pink">AI COACH</span>
-          </h3>
-          <p className="text-sm text-purple-200/70 mb-5 relative z-10">
-            Describe what you want to practice and let AI configure your trainer
-          </p>
-
-          <div className="flex gap-3 relative z-10">
-            <input
-              type="text"
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="e.g., guitar scales beginner..."
-              className="flex-1 bg-black/40 border border-cyan-500/30 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-cyan-400 focus:neon-glow-cyan transition-all placeholder-slate-500"
-              onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
-            />
-            <button
-              onClick={handleAiGenerate}
-              disabled={isAiLoading || !aiPrompt.trim()}
-              className="btn-neon bg-gradient-to-br from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-8 py-4 rounded-xl font-bold transition-all text-sm border border-pink-400/50 neon-glow-pink flex items-center gap-2"
-            >
-              {isAiLoading ? <RefreshCw size={18} className="animate-spin" /> : <Sparkles size={18} />}
-              {isAiLoading ? 'LOADING' : 'GENERATE'}
-            </button>
-          </div>
-
-          {aiMessage && (
-            <div className="mt-5 bg-purple-950/50 border border-purple-400/30 neon-glow-purple p-4 rounded-xl flex items-start gap-3 relative z-10">
-              <AlertCircle size={18} className="text-purple-300 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-purple-100">{aiMessage}</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* AI Coach Section Removed */}
 
       <footer className="mt-16 text-slate-600 text-xs relative z-10">
         <span className="text-cyan-500/50">⚡</span> {new Date().getFullYear()} ACCELERANDO <span className="text-cyan-500/50">⚡</span>
       </footer>
-
     </div>
   );
 };
+
+
 
 export default App;
