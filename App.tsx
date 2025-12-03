@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Square, Settings2, Sparkles, AlertCircle, RefreshCw, Volume2 } from 'lucide-react';
+import { Play, Square, Settings2, Sparkles, AlertCircle, RefreshCw, Volume2, Zap } from 'lucide-react';
 import { audioEngine } from './services/audioEngine';
 import { getPracticeAdvice } from './services/geminiService';
 import { Knob } from './components/Knob';
@@ -26,9 +26,9 @@ const App: React.FC = () => {
   // Initialize Audio Engine settings whenever React state changes
   useEffect(() => {
     audioEngine.setSettings(
-      currentBpm, 
-      settings.beatsPerBar, 
-      settings.increaseAmount, 
+      currentBpm,
+      settings.beatsPerBar,
+      settings.increaseAmount,
       settings.increaseIntervalBars,
       settings.maxBpm
     );
@@ -51,9 +51,9 @@ const App: React.FC = () => {
       // Reset BPM to start value if we stopped and started again
       setCurrentBpm(settings.startBpm);
       audioEngine.setSettings(
-        settings.startBpm, 
-        settings.beatsPerBar, 
-        settings.increaseAmount, 
+        settings.startBpm,
+        settings.beatsPerBar,
+        settings.increaseAmount,
         settings.increaseIntervalBars,
         settings.maxBpm
       );
@@ -88,158 +88,186 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-50 flex flex-col items-center py-8 px-4 font-sans">
-      
-      <header className="mb-8 text-center">
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 tracking-tight mb-2">
-          Accelerando
-        </h1>
-        <p className="text-slate-400 text-sm">Der smarte Speed-Trainer</p>
+    <div className="min-h-screen relative flex flex-col items-center py-8 px-4 font-sans">
+
+      {/* Floating particles for atmosphere */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-10 w-2 h-2 rounded-full bg-cyan-400 opacity-60 floating-particle" style={{ animationDelay: '0s' }}></div>
+        <div className="absolute top-40 right-20 w-3 h-3 rounded-full bg-purple-400 opacity-40 floating-particle" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-32 left-1/4 w-2 h-2 rounded-full bg-pink-400 opacity-50 floating-particle" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-1/3 right-1/3 w-2 h-2 rounded-full bg-cyan-400 opacity-30 floating-particle" style={{ animationDelay: '1s' }}></div>
+      </div>
+
+      <header className="mb-12 text-center relative z-10">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <Zap className="text-neon-cyan" size={36} />
+          <h1 className="text-5xl font-black text-neon-cyan tracking-wider">
+            ACCELERANDO
+          </h1>
+          <Zap className="text-neon-cyan" size={36} />
+        </div>
+        <p className="text-purple-300 text-sm tracking-widest uppercase">Speed Trainer • Neon Edition</p>
       </header>
 
-      {/* Main Visualizer */}
-      <div className="relative w-64 h-64 mb-10 flex items-center justify-center">
-        {/* Pulsing Rings */}
-        <div className={`absolute inset-0 rounded-full border-4 transition-all duration-100 ${
-          isPlaying && currentBeat === 0 ? 'border-blue-500 scale-105 opacity-100 shadow-[0_0_40px_rgba(59,130,246,0.5)]' : 'border-slate-800 scale-100 opacity-50'
-        }`}></div>
-         <div className={`absolute inset-4 rounded-full border-2 transition-all duration-75 ${
-          isPlaying && currentBeat >= 0 ? 'border-slate-600' : 'border-slate-800'
-        }`}></div>
-        
-        {/* Center Display */}
-        <div className="text-center z-10">
-          <div className="text-6xl font-black text-white tabular-nums tracking-tighter">
-            {Math.round(currentBpm)}
+      {/* Main BPM Display - Neon Ring */}
+      <div className="relative w-80 h-80 mb-12 flex items-center justify-center">
+        {/* Outer glow ring */}
+        <div className={`absolute inset-0 rounded-full border-4 transition-all duration-150 ${isPlaying && currentBeat === 0
+            ? 'border-cyan-400 scale-110 neon-glow-cyan neon-pulse'
+            : 'border-cyan-900/30 scale-100'
+          }`}></div>
+
+        {/* Middle ring */}
+        <div className={`absolute inset-8 rounded-full border-2 transition-all duration-100 ${isPlaying && currentBeat >= 0
+            ? 'border-purple-500/50 neon-glow-purple'
+            : 'border-purple-900/20'
+          }`}></div>
+
+        {/* Inner ring with glassmorphism */}
+        <div className="absolute inset-16 rounded-full glass-card flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-8xl font-black text-neon-cyan tabular-nums tracking-tighter">
+              {Math.round(currentBpm)}
+            </div>
+            <div className="text-neon-purple font-bold uppercase tracking-[0.3em] text-sm mt-2">BPM</div>
           </div>
-          <div className="text-blue-400 font-semibold uppercase tracking-widest text-xs mt-1">BPM</div>
         </div>
 
         {/* Beat Indicators */}
-        <div className="absolute bottom-8 flex gap-2">
+        <div className="absolute -bottom-6 flex gap-3">
           {Array.from({ length: settings.beatsPerBar }).map((_, i) => (
-            <div 
-              key={i} 
-              className={`w-3 h-3 rounded-full transition-all duration-75 ${
-                currentBeat === i 
-                  ? (i === 0 ? 'bg-blue-400 shadow-lg scale-125' : 'bg-slate-200 shadow scale-110') 
-                  : 'bg-slate-700'
-              }`}
+            <div
+              key={i}
+              className={`w-4 h-4 rounded-full transition-all duration-100 ${currentBeat === i
+                  ? (i === 0
+                    ? 'bg-cyan-400 neon-glow-cyan scale-150 beat-active'
+                    : 'bg-pink-400 neon-glow-pink scale-125 beat-active')
+                  : 'bg-slate-700/50 border border-slate-600/30'
+                }`}
             />
           ))}
         </div>
       </div>
 
-      {/* Play Controls */}
-      <div className="mb-12">
+      {/* Play/Stop Button - Neon Style */}
+      <div className="mb-16 relative z-10">
         <button
           onClick={togglePlay}
           className={`
-            w-20 h-20 rounded-full flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 shadow-2xl
-            ${isPlaying 
-              ? 'bg-slate-800 text-red-500 border-2 border-slate-700 hover:border-red-500/50' 
-              : 'bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-blue-500/25'}
+            btn-neon w-24 h-24 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 relative
+            ${isPlaying
+              ? 'bg-gradient-to-br from-pink-600 to-red-600 border-2 border-pink-400 neon-glow-pink'
+              : 'bg-gradient-to-br from-cyan-600 to-blue-600 border-2 border-cyan-400 neon-glow-cyan'}
           `}
         >
-          {isPlaying ? <Square fill="currentColor" size={32} /> : <Play fill="currentColor" className="ml-1" size={32} />}
+          {isPlaying
+            ? <Square fill="white" size={40} className="relative z-10" />
+            : <Play fill="white" className="ml-1 relative z-10" size={40} />}
         </button>
       </div>
 
-      {/* Settings Grid */}
-      <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="md:col-span-2 bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-           <h3 className="text-slate-300 font-semibold mb-4 flex items-center gap-2">
-             <Settings2 size={18} /> Grundeinstellungen
-           </h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <Knob 
-                label="Start Geschwindigkeit" 
-                value={settings.startBpm} 
-                onChange={(v) => {
-                  setSettings({...settings, startBpm: v});
-                  if (!isPlaying) setCurrentBpm(v);
-                }} 
-                unit="BPM"
-                min={30} max={250}
-             />
-             <Knob 
-                label="Taktart" 
-                value={settings.beatsPerBar} 
-                onChange={(v) => setSettings({...settings, beatsPerBar: v})} 
-                min={1} max={12}
-             />
-           </div>
+      {/* Settings Grid - Glassmorphism Cards */}
+      <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
+
+        {/* Basic Settings */}
+        <div className="glass-card p-6">
+          <h3 className="text-cyan-300 font-bold mb-5 flex items-center gap-2 text-lg">
+            <Settings2 size={20} className="text-neon-cyan" />
+            <span className="text-neon-cyan">BASIC</span>
+          </h3>
+          <div className="space-y-6">
+            <Knob
+              label="Start Tempo"
+              value={settings.startBpm}
+              onChange={(v) => {
+                setSettings({ ...settings, startBpm: v });
+                if (!isPlaying) setCurrentBpm(v);
+              }}
+              unit="BPM"
+              min={30} max={250}
+            />
+            <Knob
+              label="Time Signature"
+              value={settings.beatsPerBar}
+              onChange={(v) => setSettings({ ...settings, beatsPerBar: v })}
+              min={1} max={12}
+            />
+          </div>
         </div>
 
-        <div className="md:col-span-2 bg-slate-800/50 p-4 rounded-xl border border-blue-900/30 relative overflow-hidden">
-           <div className="absolute top-0 right-0 p-4 opacity-10">
-             <RefreshCw size={100} />
-           </div>
-           <h3 className="text-blue-300 font-semibold mb-4 flex items-center gap-2 relative z-10">
-             <Volume2 size={18} /> Automatische Steigerung (Trainer)
-           </h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-             <Knob 
-                label="Steigerung" 
-                value={settings.increaseAmount} 
-                onChange={(v) => setSettings({...settings, increaseAmount: v})} 
-                min={0} max={10} unit="BPM"
-             />
-             <Knob 
-                label="Intervall (Takte)" 
-                value={settings.increaseIntervalBars} 
-                onChange={(v) => setSettings({...settings, increaseIntervalBars: v})} 
-                min={1} max={32}
-             />
-           </div>
-           <p className="text-xs text-slate-400 mt-4 relative z-10">
-             {settings.increaseAmount > 0 
-               ? `Geschwindigkeit erhöht sich um ${settings.increaseAmount} BPM alle ${settings.increaseIntervalBars} Takte.` 
-               : "Automatische Steigerung ist deaktiviert."}
-           </p>
+        {/* Accelerando Trainer */}
+        <div className="glass-card p-6 border-purple-500/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <h3 className="text-purple-300 font-bold mb-5 flex items-center gap-2 text-lg relative z-10">
+            <RefreshCw size={20} className="text-neon-purple" />
+            <span className="text-neon-purple">TRAINER</span>
+          </h3>
+          <div className="space-y-6 relative z-10">
+            <Knob
+              label="Increase By"
+              value={settings.increaseAmount}
+              onChange={(v) => setSettings({ ...settings, increaseAmount: v })}
+              min={0} max={10} unit="BPM"
+            />
+            <Knob
+              label="Every N Bars"
+              value={settings.increaseIntervalBars}
+              onChange={(v) => setSettings({ ...settings, increaseIntervalBars: v })}
+              min={1} max={32}
+            />
+          </div>
+          <p className="text-xs text-purple-200/60 mt-4 relative z-10">
+            {settings.increaseAmount > 0
+              ? `+${settings.increaseAmount} BPM every ${settings.increaseIntervalBars} bars`
+              : "Trainer disabled"}
+          </p>
         </div>
       </div>
 
-      {/* AI Section */}
-      <div className="w-full max-w-2xl">
-        <div className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-500/30 rounded-xl p-6">
-          <h3 className="text-indigo-200 font-semibold mb-3 flex items-center gap-2">
-            <Sparkles size={18} className="text-indigo-400" />
-            KI Übungs-Coach
+      {/* AI Coach Section */}
+      <div className="w-full max-w-3xl relative z-10">
+        <div className="glass-card p-8 border-pink-500/30 relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+          <h3 className="text-pink-300 font-bold mb-3 flex items-center gap-2 text-xl relative z-10">
+            <Sparkles size={22} className="text-neon-pink" />
+            <span className="text-neon-pink">AI COACH</span>
           </h3>
-          <p className="text-sm text-slate-400 mb-4">
-            Beschreibe, was du üben möchtest (z.B. "Gitarren Skalen für Anfänger" oder "Schnelles Drum-Fill"), und die KI stellt das Metronom für dich ein.
+          <p className="text-sm text-purple-200/70 mb-5 relative z-10">
+            Describe what you want to practice and let AI configure your trainer
           </p>
-          
-          <div className="flex gap-2">
-            <input 
-              type="text" 
+
+          <div className="flex gap-3 relative z-10">
+            <input
+              type="text"
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="z.B. Klavier Arpeggios steigern..."
-              className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              placeholder="e.g., guitar scales beginner..."
+              className="flex-1 bg-black/40 border border-cyan-500/30 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-cyan-400 focus:neon-glow-cyan transition-all placeholder-slate-500"
               onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
             />
-            <button 
+            <button
               onClick={handleAiGenerate}
               disabled={isAiLoading || !aiPrompt.trim()}
-              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
+              className="btn-neon bg-gradient-to-br from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-8 py-4 rounded-xl font-bold transition-all text-sm border border-pink-400/50 neon-glow-pink flex items-center gap-2"
             >
-              {isAiLoading ? '...' : 'Generieren'}
+              {isAiLoading ? <RefreshCw size={18} className="animate-spin" /> : <Sparkles size={18} />}
+              {isAiLoading ? 'LOADING' : 'GENERATE'}
             </button>
           </div>
 
           {aiMessage && (
-            <div className="mt-4 bg-indigo-950/50 border border-indigo-500/20 p-3 rounded-lg flex items-start gap-3">
-              <div className="mt-1"><AlertCircle size={16} className="text-indigo-400" /></div>
-              <p className="text-sm text-indigo-100 italic">{aiMessage}</p>
+            <div className="mt-5 bg-purple-950/50 border border-purple-400/30 neon-glow-purple p-4 rounded-xl flex items-start gap-3 relative z-10">
+              <AlertCircle size={18} className="text-purple-300 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-purple-100">{aiMessage}</p>
             </div>
           )}
         </div>
       </div>
 
-      <footer className="mt-12 text-slate-600 text-xs">
-        &copy; {new Date().getFullYear()} Accelerando Music Tools
+      <footer className="mt-16 text-slate-600 text-xs relative z-10">
+        <span className="text-cyan-500/50">⚡</span> {new Date().getFullYear()} ACCELERANDO <span className="text-cyan-500/50">⚡</span>
       </footer>
 
     </div>

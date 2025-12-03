@@ -2,30 +2,250 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #0f172a;
-  color: white;
+:root {
+  --neon-cyan: #00ffff;
+  --neon-pink: #ff00ff;
+  --neon-purple: #8b00ff;
+  --neon-blue: #0080ff;
+  --neon-green: #00ff88;
+  --dark-bg: #0a0a0f;
+  --dark-card: #1a1a2e;
 }
 
-/* Custom slider styling */
-input[type=range] {
-  -webkit-appearance: none; 
-  background: transparent; 
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0f0a1a 100%);
+  color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Neon glow utilities */
+.neon-glow-cyan {
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.5),
+    0 0 20px rgba(0, 255, 255, 0.3),
+    0 0 30px rgba(0, 255, 255, 0.2),
+    0 0 40px rgba(0, 255, 255, 0.1);
+}
+
+.neon-glow-pink {
+  box-shadow:
+    0 0 10px rgba(255, 0, 255, 0.5),
+    0 0 20px rgba(255, 0, 255, 0.3),
+    0 0 30px rgba(255, 0, 255, 0.2);
+}
+
+.neon-glow-purple {
+  box-shadow:
+    0 0 10px rgba(139, 0, 255, 0.5),
+    0 0 20px rgba(139, 0, 255, 0.3),
+    0 0 30px rgba(139, 0, 255, 0.2);
+}
+
+.text-neon-cyan {
+  color: var(--neon-cyan);
+  text-shadow:
+    0 0 10px rgba(0, 255, 255, 0.8),
+    0 0 20px rgba(0, 255, 255, 0.5),
+    0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+.text-neon-pink {
+  color: var(--neon-pink);
+  text-shadow:
+    0 0 10px rgba(255, 0, 255, 0.8),
+    0 0 20px rgba(255, 0, 255, 0.5);
+}
+
+.text-neon-purple {
+  color: var(--neon-purple);
+  text-shadow:
+    0 0 10px rgba(139, 0, 255, 0.8),
+    0 0 20px rgba(139, 0, 255, 0.5);
+}
+
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(26, 26, 46, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Neon border animation */
+@keyframes neon-pulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px rgba(0, 255, 255, 0.5),
+      0 0 10px rgba(0, 255, 255, 0.3),
+      0 0 15px rgba(0, 255, 255, 0.2),
+      inset 0 0 10px rgba(0, 255, 255, 0.1);
+  }
+
+  50% {
+    box-shadow:
+      0 0 10px rgba(0, 255, 255, 0.8),
+      0 0 20px rgba(0, 255, 255, 0.5),
+      0 0 30px rgba(0, 255, 255, 0.3),
+      inset 0 0 15px rgba(0, 255, 255, 0.2);
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* Beat circle animation */
+@keyframes beat-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.beat-active {
+  animation: beat-pulse 0.15s ease-out;
+}
+
+/* Custom slider styling with neon effect */
+input[type=range] {
+  -webkit-appearance: none;
+  background: transparent;
+  width: 100%;
+}
+
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 16px;
-  width: 16px;
+  height: 20px;
+  width: 20px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
   cursor: pointer;
-  margin-top: -6px; 
+  margin-top: -8px;
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.8),
+    0 0 20px rgba(0, 255, 255, 0.4);
+  transition: all 0.2s ease;
 }
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 15px rgba(0, 255, 255, 1),
+    0 0 30px rgba(0, 255, 255, 0.6);
+}
+
 input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 4px;
   cursor: pointer;
-  background: #334155;
+  background: linear-gradient(90deg,
+      rgba(0, 255, 255, 0.2) 0%,
+      rgba(0, 128, 255, 0.2) 100%);
   border-radius: 2px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+input[type=range]::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+  cursor: pointer;
+  border: none;
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.8),
+    0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: linear-gradient(90deg,
+      rgba(0, 255, 255, 0.2) 0%,
+      rgba(0, 128, 255, 0.2) 100%);
+  border-radius: 2px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+/* Glowing button effects */
+.btn-neon {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-neon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(0, 255, 255, 0.3);
+  transition: width 0.4s ease, height 0.4s ease, top 0.4s ease, left 0.4s ease;
+  transform: translate(-50%, -50%);
+}
+
+.btn-neon:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Particle effect background */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+
+  33% {
+    transform: translateY(-20px) translateX(10px);
+  }
+
+  66% {
+    transform: translateY(-10px) translateX(-10px);
+  }
+}
+
+.floating-particle {
+  animation: float 6s ease-in-out infinite;
 }
