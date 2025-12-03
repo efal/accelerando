@@ -57,6 +57,20 @@ body::before {
     0 0 30px rgba(139, 0, 255, 0.2);
 }
 
+.neon-glow-green {
+  box-shadow:
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3),
+    0 0 30px rgba(0, 255, 136, 0.2);
+}
+
+.neon-glow-red {
+  box-shadow:
+    0 0 10px rgba(255, 68, 85, 0.5),
+    0 0 20px rgba(255, 68, 85, 0.3),
+    0 0 30px rgba(255, 68, 85, 0.2);
+}
+
 .text-neon-cyan {
   color: var(--neon-cyan);
   text-shadow:

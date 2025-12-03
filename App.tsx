@@ -3,6 +3,7 @@ import { Play, Square, Settings2, RefreshCw, Volume2, Zap } from 'lucide-react';
 import { audioEngine } from './services/audioEngine';
 
 import { Knob } from './components/Knob';
+import { TempoRangeCircle } from './components/TempoRangeCircle';
 import { PracticeSettings } from './types';
 
 const App: React.FC = () => {
@@ -157,45 +158,20 @@ const App: React.FC = () => {
         <p className="text-purple-300 text-sm tracking-widest uppercase">Speed Trainer • Neon Edition</p>
       </header>
 
-      {/* Main BPM Display - Neon Ring */}
-      <div className="relative w-80 h-80 mb-12 flex items-center justify-center">
-        {/* Outer glow ring */}
-        <div className={`absolute inset-0 rounded-full border-4 transition-all duration-150 ${isPlaying && currentBeat === 0
-          ? 'border-cyan-400 scale-110 neon-glow-cyan neon-pulse'
-          : 'border-cyan-900/30 scale-100'
-          }`}></div>
-
-        {/* Middle ring */}
-        <div className={`absolute inset-8 rounded-full border-2 transition-all duration-100 ${isPlaying && currentBeat >= 0
-          ? 'border-purple-500/50 neon-glow-purple'
-          : 'border-purple-900/20'
-          }`}></div>
-
-        {/* Inner ring with glassmorphism */}
-        <div className="absolute inset-16 rounded-full glass-card flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-8xl font-black text-neon-cyan tabular-nums tracking-tighter">
-              {Math.round(currentBpm)}
-            </div>
-            <div className="text-neon-purple font-bold uppercase tracking-[0.3em] text-sm mt-2">BPM</div>
-          </div>
-        </div>
-
-        {/* Beat Indicators */}
-        <div className="absolute -bottom-6 flex gap-3">
-          {Array.from({ length: settings.beatsPerBar }).map((_, i) => (
-            <div
-              key={i}
-              className={`w-4 h-4 rounded-full transition-all duration-100 ${currentBeat === i
-                ? (i === 0
-                  ? 'bg-cyan-400 neon-glow-cyan scale-150 beat-active'
-                  : 'bg-pink-400 neon-glow-pink scale-125 beat-active')
-                : 'bg-slate-700/50 border border-slate-600/30'
-                }`}
-            />
-          ))}
-        </div>
-      </div>
+      {/* Main BPM Display - Neon Ring with Integrated Controls */}
+      <TempoRangeCircle
+        currentBpm={currentBpm}
+        startBpm={settings.startBpm}
+        maxBpm={settings.maxBpm}
+        onStartBpmChange={(v) => {
+          setSettings(s => ({ ...s, startBpm: v }));
+          if (!isPlaying) setCurrentBpm(v);
+        }}
+        onMaxBpmChange={(v) => setSettings(s => ({ ...s, maxBpm: v }))}
+        isPlaying={isPlaying}
+        currentBeat={currentBeat}
+        beatsPerBar={settings.beatsPerBar}
+      />
 
       {/* Play/Stop Button - Neon Style */}
       <div className="mb-8 relative z-10">
@@ -274,18 +250,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-7xl mb-8 relative z-10">
         <div className="glass-card p-8">
           <div className="flex flex-wrap justify-center gap-8 lg:gap-12">
-            <div className="w-full sm:w-auto">
-              <Knob
-                label="Start Tempo"
-                value={settings.startBpm}
-                onChange={(v) => {
-                  setSettings({ ...settings, startBpm: v });
-                  if (!isPlaying) setCurrentBpm(v);
-                }}
-                unit="BPM"
-                min={30} max={250}
-              />
-            </div>
+
             <div className="w-full sm:w-auto">
               <Knob
                 label="Time Signature"
@@ -310,14 +275,7 @@ const App: React.FC = () => {
                 min={1} max={32}
               />
             </div>
-            <div className="w-full sm:w-auto">
-              <Knob
-                label="Max Speed"
-                value={settings.maxBpm}
-                onChange={(v) => setSettings({ ...settings, maxBpm: v })}
-                min={settings.startBpm} max={300} unit="BPM"
-              />
-            </div>
+
           </div>
           <p className="text-xs text-purple-200/60 mt-6 text-center">
             {settings.increaseAmount > 0
