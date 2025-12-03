@@ -79,17 +79,17 @@ body::before {
     0 0 20px rgba(139, 0, 255, 0.5);
 }
 
-/* Glassmorphism cards */
+/* Glassmorphism cards - ULTRA TRANSPARENT */
 .glass-card {
-  background: rgba(26, 26, 46, 0.4);
+  background: rgba(26, 26, 46, 0.08);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 255, 255, 0.2);
+  border: 1px solid rgba(0, 255, 255, 0.08);
   border-radius: 16px;
   transition: all 0.3s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(0, 255, 255, 0.4);
+  border-color: rgba(0, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
@@ -246,4 +246,42 @@ input[type=range]::-moz-range-track {
 
 .floating-particle {
   animation: float 6s ease-in-out infinite;
+}
+
+/* Pulsing orb animation */
+@keyframes pulse-orb {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
+}
+
+.pulsing-orb {
+  animation: pulse-orb 8s ease-in-out infinite;
+}
+
+/* Scanning line animation */
+@keyframes scan {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.scanning-line {
+  animation: scan 6s linear infinite;
 }
