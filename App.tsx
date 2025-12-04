@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Square, Settings2, RefreshCw, Volume2, Zap } from 'lucide-react';
 import { audioEngine } from './services/audioEngine';
 
-import { Knob } from './components/Knob';
 import { TempoRangeCircle } from './components/TempoRangeCircle';
+import { PlayButtonWithDial } from './components/PlayButtonWithDial';
 import { PracticeSettings } from './types';
 
 const App: React.FC = () => {
@@ -12,11 +12,11 @@ const App: React.FC = () => {
     startBpm: 80,
     maxBpm: 200,
     increaseAmount: 0,
-    increaseIntervalBars: 4,
+    increaseIntervalBars: 1,
     beatsPerBar: 4
   });
 
-  const [soundType, setSoundType] = useState<'beep' | 'click' | 'woodblock' | 'cowbell' | 'kick' | 'snare' | 'drumset'>('beep');
+  const [soundType, setSoundType] = useState<'beep' | 'click' | 'woodblock' | 'cowbell' | 'drumset'>('beep');
 
   // Runtime State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -171,23 +171,17 @@ const App: React.FC = () => {
         isPlaying={isPlaying}
         currentBeat={currentBeat}
         beatsPerBar={settings.beatsPerBar}
+        showMaxSlider={settings.increaseAmount > 0}
       />
 
-      {/* Play/Stop Button - Neon Style */}
-      <div className="mb-8 relative z-10">
-        <button
-          onClick={togglePlay}
-          className={`
-            btn-neon w-24 h-24 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 relative
-            ${isPlaying
-              ? 'bg-gradient-to-br from-pink-600 to-red-600 border-2 border-pink-400 neon-glow-pink'
-              : 'bg-gradient-to-br from-cyan-600 to-blue-600 border-2 border-cyan-400 neon-glow-cyan'}
-          `}
-        >
-          {isPlaying
-            ? <Square fill="white" size={40} className="relative z-10" />
-            : <Play fill="white" className="ml-1 relative z-10" size={40} />}
-        </button>
+      {/* Play/Stop Button with Speed Dial */}
+      <div className="mb-12 relative z-10">
+        <PlayButtonWithDial
+          isPlaying={isPlaying}
+          onTogglePlay={togglePlay}
+          increaseAmount={settings.increaseAmount}
+          onIncreaseAmountChange={(v) => setSettings(s => ({ ...s, increaseAmount: v }))}
+        />
       </div>
 
       {/* Sound Selection */}
@@ -195,8 +189,8 @@ const App: React.FC = () => {
         <div className="glass-card p-4 inline-block">
           <div className="flex items-center gap-4">
             <span className="text-cyan-300 text-xs font-bold uppercase tracking-widest">Sound:</span>
-            <div className="flex gap-2">
-              {(['beep', 'click', 'woodblock', 'cowbell', 'kick', 'snare', 'drumset'] as const).map((sound) => (
+            <div className="flex gap-2 flex-wrap justify-center">
+              {(['beep', 'click', 'woodblock', 'cowbell', 'drumset'] as const).map((sound) => (
                 <button
                   key={sound}
                   onClick={() => setSoundType(sound)}
@@ -209,8 +203,6 @@ const App: React.FC = () => {
                   {sound === 'click' && '⚡'}
                   {sound === 'woodblock' && '🎵'}
                   {sound === 'cowbell' && '🔔'}
-                  {sound === 'kick' && '🥁'}
-                  {sound === 'snare' && '🎼'}
                   {sound === 'drumset' && '🥁'}
                   <span className="ml-1">{sound}</span>
                 </button>
@@ -246,51 +238,51 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* All Controls in Single Horizontal Row */}
-      <div className="w-full max-w-7xl mb-8 relative z-10">
-        <div className="glass-card p-8">
-          <div className="flex flex-wrap justify-center gap-8 lg:gap-12">
-
-            <div className="w-full sm:w-auto">
-              <Knob
-                label="Time Signature"
-                value={settings.beatsPerBar}
-                onChange={(v) => setSettings({ ...settings, beatsPerBar: v })}
-                min={1} max={12}
-              />
+      {/* Time Signature Selection */}
+      <div className="mb-8 relative z-10">
+        <div className="glass-card p-4 inline-block">
+          <div className="flex items-center gap-4">
+            <span className="text-purple-300 text-xs font-bold uppercase tracking-widest">Time:</span>
+            <div className="flex gap-2">
+              {[
+                { label: '2/4', beats: 2 },
+                { label: '3/4', beats: 3 },
+                { label: '4/4', beats: 4 },
+                { label: '6/8', beats: 6 }
+              ].map((sig) => (
+                <button
+                  key={sig.label}
+                  onClick={() => setSettings({ ...settings, beatsPerBar: sig.beats })}
+                  className={`px-5 py-3 rounded-lg text-lg font-bold transition-all ${settings.beatsPerBar === sig.beats
+                    ? 'bg-purple-500/30 text-purple-300 border-2 border-purple-400/50 neon-glow-purple'
+                    : 'bg-black/20 text-slate-400 border border-slate-600/30 hover:border-purple-400/30 hover:text-purple-400'
+                    }`}
+                >
+                  {sig.label}
+                </button>
+              ))}
             </div>
-            <div className="w-full sm:w-auto">
-              <Knob
-                label="Increase By"
-                value={settings.increaseAmount}
-                onChange={(v) => setSettings({ ...settings, increaseAmount: v })}
-                min={0} max={10} unit="BPM"
-              />
-            </div>
-            <div className="w-full sm:w-auto">
-              <Knob
-                label="Every N Bars"
-                value={settings.increaseIntervalBars}
-                onChange={(v) => setSettings({ ...settings, increaseIntervalBars: v })}
-                min={1} max={32}
-              />
-            </div>
-
           </div>
-          <p className="text-xs text-purple-200/60 mt-6 text-center">
-            {settings.increaseAmount > 0
-              ? `⚡ Trainer active: +${settings.increaseAmount} BPM every ${settings.increaseIntervalBars} bars`
-              : "Trainer disabled"}
-          </p>
         </div>
       </div>
+
+      {/* Trainer Info */}
+      {
+        settings.increaseAmount > 0 && (
+          <div className="mb-8 relative z-10">
+            <p className="text-sm text-purple-300 bg-purple-500/10 px-4 py-2 rounded-lg border border-purple-500/20">
+              ⚡ Speed Trainer: +{settings.increaseAmount} BPM pro {settings.increaseIntervalBars} Takte
+            </p>
+          </div>
+        )
+      }
 
       {/* AI Coach Section Removed */}
 
       <footer className="mt-16 text-slate-600 text-xs relative z-10">
         <span className="text-cyan-500/50">⚡</span> {new Date().getFullYear()} ACCELERANDO <span className="text-cyan-500/50">⚡</span>
       </footer>
-    </div>
+    </div >
   );
 };
 

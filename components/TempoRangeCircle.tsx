@@ -9,6 +9,7 @@ interface TempoRangeCircleProps {
     isPlaying: boolean;
     currentBeat: number;
     beatsPerBar: number;
+    showMaxSlider?: boolean;
 }
 
 export const TempoRangeCircle: React.FC<TempoRangeCircleProps> = ({
@@ -19,7 +20,8 @@ export const TempoRangeCircle: React.FC<TempoRangeCircleProps> = ({
     onMaxBpmChange,
     isPlaying,
     currentBeat,
-    beatsPerBar
+    beatsPerBar,
+    showMaxSlider = true
 }) => {
     const [dragging, setDragging] = useState<'start' | 'max' | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -314,43 +316,47 @@ export const TempoRangeCircle: React.FC<TempoRangeCircleProps> = ({
             </div>
 
             {/* Max BPM Handle */}
-            <div
-                className="absolute pointer-events-auto cursor-grab active:cursor-grabbing"
-                style={{
-                    left: `calc(50% + ${maxHandle.x}px - 20px)`,
-                    top: `calc(50% + ${maxHandle.y}px - 20px)`,
-                    width: '40px',
-                    height: '40px',
-                    touchAction: 'none'
-                }}
-                onMouseDown={handleMouseDown('max')}
-                onTouchStart={handleTouchStart('max')}
-            >
-                <div className={`w-full h-full rounded-full border-[3px] flex items-center justify-center transition-all ${dragging === 'max'
-                    ? 'bg-red-500 border-red-300 neon-glow-red scale-125'
-                    : 'bg-gradient-to-br from-red-600 to-rose-600 border-red-400 hover:scale-110 neon-glow-red'
-                    }`}>
-                    <div className="text-white text-xs font-bold">M</div>
+            {showMaxSlider && (
+                <div
+                    className="absolute pointer-events-auto cursor-grab active:cursor-grabbing"
+                    style={{
+                        left: `calc(50% + ${maxHandle.x}px - 20px)`,
+                        top: `calc(50% + ${maxHandle.y}px - 20px)`,
+                        width: '40px',
+                        height: '40px',
+                        touchAction: 'none'
+                    }}
+                    onMouseDown={handleMouseDown('max')}
+                    onTouchStart={handleTouchStart('max')}
+                >
+                    <div className={`w-full h-full rounded-full border-[3px] flex items-center justify-center transition-all ${dragging === 'max'
+                        ? 'bg-red-500 border-red-300 neon-glow-red scale-125'
+                        : 'bg-gradient-to-br from-red-600 to-rose-600 border-red-400 hover:scale-110 neon-glow-red'
+                        }`}>
+                        <div className="text-white text-xs font-bold">M</div>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Max Label (Outside) */}
-            <div
-                className="absolute pointer-events-none transition-all duration-75"
-                style={{
-                    left: `calc(50% + ${polarToCartesian(maxAngle, 190).x}px)`,
-                    top: `calc(50% + ${polarToCartesian(maxAngle, 190).y}px)`,
-                    transform: 'translate(-50%, -50%)'
-                }}
-            >
-                <div className="flex flex-col items-center bg-black/40 backdrop-blur-md px-3 py-1 rounded-lg border border-red-500/30">
-                    <div className="text-red-300 text-sm font-bold">{maxBpm}</div>
-                    <div className="text-red-400/60 text-[9px] uppercase tracking-wider">Max</div>
+            {showMaxSlider && (
+                <div
+                    className="absolute pointer-events-none transition-all duration-75"
+                    style={{
+                        left: `calc(50% + ${polarToCartesian(maxAngle, 190).x}px)`,
+                        top: `calc(50% + ${polarToCartesian(maxAngle, 190).y}px)`,
+                        transform: 'translate(-50%, -50%)'
+                    }}
+                >
+                    <div className="flex flex-col items-center bg-black/40 backdrop-blur-md px-3 py-1 rounded-lg border border-red-500/30">
+                        <div className="text-red-300 text-sm font-bold">{maxBpm}</div>
+                        <div className="text-red-400/60 text-[9px] uppercase tracking-wider">Max</div>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Beat Indicators */}
-            <div className="absolute -bottom-6 flex gap-3">
+            <div className="absolute -bottom-6 flex gap-6">
                 {Array.from({ length: beatsPerBar }).map((_, i) => (
                     <div
                         key={i}
