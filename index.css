@@ -16,7 +16,7 @@ body {
   color: white;
   min-height: 100vh;
   overflow-x: hidden;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 /* Animated background grid */

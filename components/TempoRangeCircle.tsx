@@ -284,7 +284,8 @@ export const TempoRangeCircle: React.FC<TempoRangeCircleProps> = ({
                     left: `calc(50% + ${startHandle.x}px - 20px)`,
                     top: `calc(50% + ${startHandle.y}px - 20px)`,
                     width: '40px',
-                    height: '40px'
+                    height: '40px',
+                    touchAction: 'none'
                 }}
                 onMouseDown={handleMouseDown('start')}
                 onTouchStart={handleTouchStart('start')}
@@ -319,7 +320,8 @@ export const TempoRangeCircle: React.FC<TempoRangeCircleProps> = ({
                     left: `calc(50% + ${maxHandle.x}px - 20px)`,
                     top: `calc(50% + ${maxHandle.y}px - 20px)`,
                     width: '40px',
-                    height: '40px'
+                    height: '40px',
+                    touchAction: 'none'
                 }}
                 onMouseDown={handleMouseDown('max')}
                 onTouchStart={handleTouchStart('max')}
